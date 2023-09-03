@@ -1,0 +1,8 @@
+*.out
+*.exe
+*.dll
+
+samples
+samples/*
+
+
