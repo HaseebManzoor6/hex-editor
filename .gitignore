@@ -1,6 +1,6 @@
 *.out
 *.exe
-*.dll
+*.o
 
 samples
 samples/*

@@ -9,7 +9,7 @@ else
 endif
 
 all: libChunks hexView libCmd main.c
-	$(CC) $(CURSES_LIB_DEF) -o ..\bin\a main.c libCmd.o libChunks.o hexView.o $(CURSES_LNK) -lm 
+	$(CC) $(CURSES_LIB_DEF) -o ../bin/hv.exe main.c libCmd.o libChunks.o hexView.o $(CURSES_LNK) -lm 
 
 libChunks: libChunks.c
 	$(CC) $(CURSES_LIB_DEF) -c -o libChunks.o libChunks.c
