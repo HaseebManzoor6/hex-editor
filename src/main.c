@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
     struct HexView h;
     char in, *cmd; // user input
 
-    cmd = malloc(CMD_BUFSIZE*sizeof(char));
+    cmd = (char*)malloc(CMD_BUFSIZE*sizeof(char));
 
 
     // nCurses setup

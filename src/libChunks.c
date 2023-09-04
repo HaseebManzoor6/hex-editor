@@ -15,7 +15,7 @@ struct FileChunk {
 };
 
 void initFileChunk(struct FileChunk *p, unsigned int capacity) {
-    p->chunk = malloc(capacity*sizeof(char));
+    p->chunk = (char *)malloc(capacity*sizeof(char));
     p->size=0;
 }
 
@@ -38,8 +38,8 @@ void initChunkSet(struct ChunkSet *p, FILE *fp, unsigned int chunkSize) {
 
     p->fp = fp;
 
-    if(NULL == (p->low  = malloc(sizeof(struct FileChunk)))) {MEM_ERR}
-    if(NULL == (p->high = malloc(sizeof(struct FileChunk)))) {MEM_ERR}
+    if(NULL == (p->low  = (FileChunk*)malloc(sizeof(struct FileChunk)))) {MEM_ERR}
+    if(NULL == (p->high = (FileChunk*)malloc(sizeof(struct FileChunk)))) {MEM_ERR}
 
     initFileChunk(p->low, chunkSize);
     initFileChunk(p->high, chunkSize);

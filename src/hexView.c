@@ -11,18 +11,20 @@
 
 
 void initHexView(struct HexView *p, FILE *fp, unsigned int textLines, int hasColors) {
+    p->startLine=0;
     p->settings.textLines = textLines;
     initChunkSet(&(p->cs), fp, textLines * LINELENGTH);
     p->addrsize = (logl((double)(p->cs.fsize))/logl(16.0)); // Number of hex digits for addresses
     p->settings.termColors = hasColors;
 
-    p->cmdbuf = malloc(CMD_BUFSIZE*sizeof(char));
+    p->cmdbuf = (char*)malloc(CMD_BUFSIZE*sizeof(char));
     p->curx=0; p->cury=0;
     p->quit = 0;
 }
 
 void delHexView(struct HexView *p) {
     delChunkSet(&(p->cs));
+    free(p->cmdbuf);
 }
 
 #define DUMP(x) \
@@ -43,7 +45,8 @@ void render(struct HexView *hv) {
     // Print file
     for(int y=0; y<nLines && !(hv->cs.eof); y++) {
         // Print address
-        for(int i=hv->addrsize-1; i>=0; i--) addch(BYTETOHEX((startLine+y) >> (i*4)));
+        for(int i=hv->addrsize-1; i>=0; i--)
+            addch(BYTETOHEX((startLine+y) >> (i*4)));
         printw("                                                 | ");
 
         for(int x=0; x<LINELENGTH && !(hv->cs.eof); x++) {
