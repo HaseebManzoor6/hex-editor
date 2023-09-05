@@ -67,6 +67,5 @@ void render(struct HexView *hv) {
     }
 
     // command error msg line
-    addch('\n');
     clrtoeol();
 }

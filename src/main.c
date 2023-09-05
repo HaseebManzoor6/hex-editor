@@ -96,6 +96,7 @@ int main(int argc, char *argv[]) {
         use_default_colors();
         init_pair(1, -1, -1); // term colors
         init_pair(2, COLOR_RED, -1);
+        init_pair(3, COLOR_RED, -1);
     }
 
     // Main loop
@@ -103,8 +104,15 @@ int main(int argc, char *argv[]) {
         // Render
         erase();
         render(&h);
+
+        // error message line
+        if(h.settings.termColors) {
+            attron(COLOR_PAIR(3)); attron(A_REVERSE); attron(A_BOLD);}
         CmdErr::printmsg(cmderr);
+        if(h.settings.termColors) {
+            attron(COLOR_PAIR(1)); attroff(A_REVERSE); attroff(A_BOLD);}
         cmderr = CmdErr::Ok;
+
         move(1+h.cury, 1+h.addrsize+3*(h.curx/2)+(h.curx%2));
         refresh();
 
