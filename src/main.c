@@ -7,26 +7,20 @@
 #include "libCmd.h"
 #include "hexView.h"
 
-/* CONFIG */
 
-/* END CONFIG */
-
-
-#define DEBUG
-//#undef DEBUG
 
 #define MIN(x,y) (y<x)?y:x
-void handleKey(int c, struct HexView *h) {
+void handleKey(int c, struct HexView *h, CmdErr::Type *err) {
     switch(c) {
         case KEY_BACKSPACE:
-            if(h->curx==0 && h->cury+h->startLine>0) {handleKey('k',h); h->curx=LINELENGTH*2;}
+            if(h->curx==0 && h->cury+h->startLine>0) {handleKey('k',h,err); h->curx=LINELENGTH*2;}
             // Then case 'h' runs
         case 'h':
             if(h->curx>0) h->curx--;
             break;
         case ' ':
             if(h->curx==LINELENGTH*2-1 && CURSORLINE(h)<NLINES((*h))-1) {
-                handleKey('j',h);
+                handleKey('j',h,err);
                 h->curx=-1;
             }
         case 'l':
@@ -53,14 +47,17 @@ void handleKey(int c, struct HexView *h) {
             h->cury = MIN(h->settings.textLines-1,NLINES((*h))-1);
             h->curx=0;
             break;
+        // Commands
         case ':':
             move(h->settings.textLines+2, 0);
             addch(c);
-            acceptCmd(h);
-            //printf("got command of len %u: %s\n",h->cmdLen,h->cmdbuf);
-            if(parseCmd(h)) {
-                //printw("pass");
-            }
+
+            if(*err = acceptCmd(h))
+                return;
+
+            if(*err = parseCmd(h))
+                return;
+
             break;
     }
 }
@@ -79,8 +76,10 @@ int main(int argc, char *argv[]) {
     unsigned int width, height;
     struct HexView h;
     char in, *cmd; // user input
+    CmdErr::Type cmderr;
 
     cmd = (char*)malloc(CMD_BUFSIZE*sizeof(char));
+    cmderr = CmdErr::Ok;
 
 
     // nCurses setup
@@ -104,11 +103,13 @@ int main(int argc, char *argv[]) {
         // Render
         erase();
         render(&h);
+        CmdErr::printmsg(cmderr);
+        cmderr = CmdErr::Ok;
         move(1+h.cury, 1+h.addrsize+3*(h.curx/2)+(h.curx%2));
         refresh();
 
         // Controls
-        handleKey(getch(), &h);
+        handleKey(getch(), &h, &cmderr);
     }
 
     endwin();

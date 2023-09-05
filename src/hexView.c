@@ -31,6 +31,7 @@ void delHexView(struct HexView *p) {
     if(x == ' ' || x == '\n' || x == '\t' || x == '\r' || x == 0x00) addch('.'); \
     else if(hv->cs.eof) printw("EOF"); \
     else addch(x);
+
 void render(struct HexView *hv) {
     unsigned int nLines = hv->settings.textLines;
     unsigned long startLine = hv->startLine;
@@ -65,5 +66,7 @@ void render(struct HexView *hv) {
         addch('\n');
     }
 
+    // command error msg line
     addch('\n');
+    clrtoeol();
 }

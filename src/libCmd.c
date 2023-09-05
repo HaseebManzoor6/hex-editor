@@ -6,17 +6,33 @@
 #include "libCmd.h"
 #include "hexView.h"
 
-#define PASS 1
-#define FAIL 0
 
-int acceptCmd(struct HexView *h) {
+#define PRINT_FN(str) printw(str)
+void CmdErr::printmsg(CmdErr::Type t) {
+    switch(t) {
+        case CmdErr::Ok:
+            PRINT_FN("\n");
+            break;
+
+        case CmdErr::UNKNOWN:
+            PRINT_FN( "Unknown command\n" );
+            break;
+
+        default:
+            PRINT_FN( "[Internal] Unknown error code\n" );
+    }
+}
+
+CmdErr::Type acceptCmd(struct HexView *h) {
     int i=0;
     char c, *buf = h->cmdbuf;
+    clrtoeol();
     nocbreak();
     echo();
     while(i<CMD_BUFSIZE-1) {
         c = getch();
         buf[i] = c;
+        // TODO ncurses ESC code to cancel command
         if(c == '\n' || c == '\r') break;
         i++;
     }
@@ -25,7 +41,7 @@ int acceptCmd(struct HexView *h) {
     h->cmdLen=i;
     buf[i] = '\0';
 
-    return PASS;
+    return CmdErr::Ok;
 }
 
 // HexToDec solution from: https://stackoverflow.com/a/11068850
@@ -43,8 +59,9 @@ static const long hextable[] = {
     -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1
 };
 
-unsigned long hexToDec(char *buf, int size) {
+unsigned long hexToDec(const char *buf, int size) {
     unsigned long ret=0;
+
     for(int i=0; i<size; i++) {
         ret = (ret << 4) | hextable[buf[i]];
     }
@@ -53,8 +70,8 @@ unsigned long hexToDec(char *buf, int size) {
 
 // TODO response messages
 #define MIN(x,y) x=(y<x)? y:x
-int parseCmd(struct HexView *h) {
-    char *buf = h->cmdbuf;
+CmdErr::Type parseCmd(struct HexView *h) {
+    const char *buf = h->cmdbuf;
     int isAddr=1; // Is hex line number
 
     // Check if command is a hex line number
@@ -66,22 +83,32 @@ int parseCmd(struct HexView *h) {
 
     // Jump to line
     // TODO Always jump to 1 screen above, as vim does
-    if(isAddr) {h->startLine = hexToDec(buf,h->cmdLen);}
+    if(isAddr) 
+        h->startLine = hexToDec(buf,h->cmdLen);
     // Jump to end shortcut
     else if(0==strcmp(buf,"$")) {
         isAddr=1; h->startLine = h->cs.fsize;
     }
+
+    // Jump to line
     if(isAddr) {
         h->curx=0;
         h->cury=MIN(h->startLine,NLINES((*h))-1);
         h->startLine = MIN(h->startLine, CEILDIVIDE(h->cs.fsize,LINELENGTH) - h->settings.textLines);
         h->cury-=h->startLine;
         if(h->startLine<0) h->startLine=0;
+
+        return CmdErr::Ok;
     }
+
     // Quit
     else if(!strcmp(buf,"q")) {
         h->quit=1;
-    }
 
-    return FAIL;
+        return CmdErr::Ok;
+    }
+    // no command
+    else if(!strcmp(buf,"")) return CmdErr::Ok;
+
+    return CmdErr::UNKNOWN;
 }
