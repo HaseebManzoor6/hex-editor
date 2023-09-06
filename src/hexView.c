@@ -28,9 +28,8 @@ void delHexView(struct HexView *p) {
 }
 
 #define DUMP(x) \
-    if(x == ' ' || x == '\n' || x == '\t' || x == '\r' || x == 0x00) addch('.'); \
-    else if(hv->cs.eof) printw("EOF"); \
-    else addch(x);
+    if (x <= 0x20 || x==0x7F || x=0x255) addch('.'); \
+    else addch(x)
 
 void render(struct HexView *hv) {
     unsigned int nLines = hv->settings.textLines;
