@@ -126,9 +126,11 @@ void handleKeyReplace(int c, struct HexView *h, struct HexViewMeta *m) {
 
 void renderMode(HexViewMeta *m) {
     if(m->mode==MODE_INSERT) {
+        attron(COLOR_PAIR(4));
         printw("\n-- INSERT --");
     }
     else if(m->mode==MODE_REPLACE) {
+        attron(COLOR_PAIR(4));
         printw("\n-- REPLACE --");
     }
     else{clrtoeol();}
@@ -170,6 +172,7 @@ int main(int argc, char *argv[]) {
         init_pair(1, -1, -1); // term colors
         init_pair(2, COLOR_RED, -1);
         init_pair(3, COLOR_RED, -1);
+        init_pair(4, COLOR_YELLOW, -1);
     }
 
     // Main loop
