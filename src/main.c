@@ -9,13 +9,24 @@
 
 
 
+#define MODE_NORMAL 0
+#define MODE_INSERT 1
+#define MODE_REPLACE 2
+struct HexViewMeta {
+    CmdErr::Type err;
+    char mode;
+};
+
+
+
 #define MIN(x,y) (y<x)?y:x
-void handleKey(int c, struct HexView *h, CmdErr::Type *err) {
+#define ESC 27
+void handleKey(int c, struct HexView *h, struct HexViewMeta *m) {
 #define LAST_X ((CURSORLINE(h)==NLINES(*h)-1)?  1+2*((h->cs.fsize-1)%LINELENGTH) : LINELENGTH*2 - 1)
     switch(c) {
         case KEY_LEFT:
         case KEY_BACKSPACE:
-            if(h->curx==0 && h->cury+h->startLine>0) {handleKey('k',h,err); h->curx=LINELENGTH*2;}
+            if(h->curx==0 && h->cury+h->startLine>0) {handleKey('k',h,m); h->curx=LINELENGTH*2;}
             // Then case 'h' runs
         case 'h':
             if(h->curx>0) h->curx--;
@@ -23,7 +34,7 @@ void handleKey(int c, struct HexView *h, CmdErr::Type *err) {
         case KEY_RIGHT:
         case ' ':
             if(h->curx==LINELENGTH*2-1 && CURSORLINE(h)<NLINES((*h))-1) {
-                handleKey('j',h,err);
+                handleKey('j',h,m);
                 h->curx=-1;
             }
         case 'l':
@@ -60,23 +71,67 @@ void handleKey(int c, struct HexView *h, CmdErr::Type *err) {
         case '$':
             h->curx = LAST_X;
             break;
-        // ESC
-        case 27: 
-            *err = CmdErr::UNKNOWN;
+        case KEY_IC:
+        case 'i':
+            m->mode = MODE_INSERT;
             break;
         // Commands
         case ':':
             move(h->settings.textLines+2, 0);
             addch(c);
 
-            if(*err = acceptCmd(h))
+            if(m->err = acceptCmd(h))
                 return;
 
-            if(*err = parseCmd(h))
+            if(m->err = parseCmd(h))
                 return;
 
             break;
     }
+}
+
+void handleKeyInsert(int c, struct HexView *h, struct HexViewMeta *m) {
+    switch(c) {
+        case KEY_LEFT:
+        case KEY_RIGHT:
+        case KEY_UP:
+        case KEY_DOWN:
+            handleKey(c,h,m);
+            break;
+        case ESC:
+            m->mode=MODE_NORMAL;
+            break;
+        case KEY_IC:
+            m->mode=MODE_REPLACE;
+            break;
+    }
+}
+
+void handleKeyReplace(int c, struct HexView *h, struct HexViewMeta *m) {
+    switch(c) {
+        case KEY_LEFT:
+        case KEY_RIGHT:
+        case KEY_UP:
+        case KEY_DOWN:
+            handleKey(c,h,m);
+            break;
+        case ESC:
+            m->mode=MODE_NORMAL;
+            break;
+        case KEY_IC:
+            m->mode=MODE_INSERT;
+            break;
+    }
+}
+
+void renderMode(HexViewMeta *m) {
+    if(m->mode==MODE_INSERT) {
+        printw("\n-- INSERT --");
+    }
+    else if(m->mode==MODE_REPLACE) {
+        printw("\n-- REPLACE --");
+    }
+    else{clrtoeol();}
 }
 
 #define BADUSAGE(x) fprintf(stderr, "Usage: %s filename\n",argv[0]); exit(x)
@@ -93,10 +148,10 @@ int main(int argc, char *argv[]) {
     unsigned int width, height;
     struct HexView h;
     char in, *cmd; // user input
-    CmdErr::Type cmderr;
+    struct HexViewMeta m;
 
     cmd = (char*)malloc(CMD_BUFSIZE*sizeof(char));
-    cmderr = CmdErr::Ok;
+    m.err = CmdErr::Ok;
 
 
     // nCurses setup
@@ -122,20 +177,31 @@ int main(int argc, char *argv[]) {
         // Render
         erase();
         render(&h);
+        renderMode(&m);
 
         // error message line
         if(h.settings.termColors) {
             attron(COLOR_PAIR(3)); attron(A_REVERSE); attron(A_BOLD);}
-        CmdErr::printmsg(cmderr);
+        CmdErr::printmsg(m.err);
         if(h.settings.termColors) {
             attron(COLOR_PAIR(1)); attroff(A_REVERSE); attroff(A_BOLD);}
-        cmderr = CmdErr::Ok;
+        m.err = CmdErr::Ok;
 
         move(1+h.cury, 1+h.addrsize+3*(h.curx/2)+(h.curx%2));
         refresh();
 
         // Controls
-        handleKey(getch(), &h, &cmderr);
+        switch(m.mode) {
+            case MODE_NORMAL:
+                handleKey(getch(), &h, &m);
+                break;
+            case MODE_INSERT:
+                handleKeyInsert(getch(), &h, &m);
+                break;
+            case MODE_REPLACE:
+                handleKeyReplace(getch(), &h, &m);
+                break;
+        }
     }
 
     endwin();

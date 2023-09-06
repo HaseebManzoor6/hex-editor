@@ -3,6 +3,8 @@
 
 #include "hexView.h"
 
+
+
 class CmdErr {
     public:
         enum Type {

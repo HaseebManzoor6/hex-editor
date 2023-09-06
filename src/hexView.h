@@ -16,6 +16,9 @@
 // Size of buffer for commands
 #define CMD_BUFSIZE 128
 
+
+
+
 struct Settings {
     unsigned int textLines;
     int termColors;
