@@ -13,12 +13,14 @@
 void handleKey(int c, struct HexView *h, CmdErr::Type *err) {
 #define LAST_X ((CURSORLINE(h)==NLINES(*h)-1)?  1+2*((h->cs.fsize-1)%LINELENGTH) : LINELENGTH*2 - 1)
     switch(c) {
+        case KEY_LEFT:
         case KEY_BACKSPACE:
             if(h->curx==0 && h->cury+h->startLine>0) {handleKey('k',h,err); h->curx=LINELENGTH*2;}
             // Then case 'h' runs
         case 'h':
             if(h->curx>0) h->curx--;
             break;
+        case KEY_RIGHT:
         case ' ':
             if(h->curx==LINELENGTH*2-1 && CURSORLINE(h)<NLINES((*h))-1) {
                 handleKey('j',h,err);
@@ -28,12 +30,14 @@ void handleKey(int c, struct HexView *h, CmdErr::Type *err) {
             // If not at rightmost byte and not at end of file, then move cursor left
             if(h->curx<LINELENGTH*2-1 && FILEPOS(h)<h->cs.fsize) h->curx++;
             break;
+        case KEY_UP:
         case 'k':
             if(h->cury>0) h->cury--;
             else if(h->startLine > 0) {
                 h->startLine--;
             }
             break;
+        case KEY_DOWN:
         case 'j':
             if(CURSORLINE(h) < NLINES((*h))-1) {
                 if(h->cury<h->settings.textLines-1) h->cury++;
@@ -55,6 +59,10 @@ void handleKey(int c, struct HexView *h, CmdErr::Type *err) {
             break;
         case '$':
             h->curx = LAST_X;
+            break;
+        // ESC
+        case 27: 
+            *err = CmdErr::UNKNOWN;
             break;
         // Commands
         case ':':
@@ -96,6 +104,7 @@ int main(int argc, char *argv[]) {
     noecho(); // Don't show keys user types
     keypad(stdscr,TRUE); // Enable arrow/function/other keys
     getmaxyx(stdscr, height, width); // Get screen bounds
+    ESCDELAY = 10; // 10ms delay for escape codes; allows handling ESC presses
 
     initHexView(&h, fp, height-3, (has_colors() == TRUE));
 
