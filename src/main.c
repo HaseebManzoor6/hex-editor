@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
         {BADUSAGE(123);}
 
     FILE* fp;
-    if((fp = fopen(argv[1],"r")) == NULL) {
+    if((fp = fopen(argv[1],"rb")) == NULL) {
         fprintf(stderr,"Couldn't open file %s\n",argv[1]);
         exit(1);
     }
