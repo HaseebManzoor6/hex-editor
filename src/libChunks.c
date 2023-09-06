@@ -65,12 +65,18 @@ void delChunkSet(struct ChunkSet *p) {
 
 
 char chunksGet(struct ChunkSet *p, unsigned long i) {
+#ifdef DEBUG
+    fprintf(stderr,"get 0x%lx\n ",i);
+#endif
 
     p->eof = (i == p->fsize-1);
 
     if(i < 0 || i > p->fsize) {CHUNKS_ACCESS_ERR exit(1);}
 
     if(i < p->start) {
+#ifdef DEBUG
+    fprintf(stderr,"need to shift UP\n");
+#endif
         // shift up
         p->start = i < p->chunkSize ? 0 : i-(p->chunkSize);
 
@@ -88,6 +94,9 @@ char chunksGet(struct ChunkSet *p, unsigned long i) {
 
     }
     else if(i >= p->start+chunkSetSize(p)) {
+#ifdef DEBUG
+        fprintf(stderr,"need to shift DOWN\n");
+#endif
         // shift down
         p->start = i < p->chunkSize ? 0 : i-(p->chunkSize);
 
