@@ -9,7 +9,7 @@
 
 // Lots of macros for hexview-related calculations
 #define CURSORLINE(h) h->cury+h->startLine
-#define NLINES(h) CEILDIVIDE(h.cs.fsize,LINELENGTH)
+#define NLINES(h) CEILDIVIDE((h).cs.fsize,LINELENGTH)
 // Byte index in the file
 #define FILEPOS(h) LINELENGTH*(h->startLine+h->cury)+(h->curx+1)/2
 

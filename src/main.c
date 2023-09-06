@@ -11,6 +11,7 @@
 
 #define MIN(x,y) (y<x)?y:x
 void handleKey(int c, struct HexView *h, CmdErr::Type *err) {
+#define LAST_X (CURSORLINE(h)==NLINES(*h)-1)?  1+2*((h->cs.fsize-1)%LINELENGTH) : LINELENGTH*2 - 1;
     switch(c) {
         case KEY_BACKSPACE:
             if(h->curx==0 && h->cury+h->startLine>0) {handleKey('k',h,err); h->curx=LINELENGTH*2;}
@@ -40,12 +41,20 @@ void handleKey(int c, struct HexView *h, CmdErr::Type *err) {
             }
             if(CURSORLINE(h)==NLINES((*h))-1) h->curx=MIN(h->curx,1+2*((h->cs.fsize-1)%LINELENGTH));
             break;
+
         case 'H':
-            h->curx = h->cury = 0;
+            h->cury = 0;
             break;
         case 'L':
             h->cury = MIN(h->settings.textLines-1,NLINES((*h))-1);
+            h->curx = LAST_X;
+            break;
+        case '^':
+        case '0':
             h->curx=0;
+            break;
+        case '$':
+            h->curx = LAST_X;
             break;
         // Commands
         case ':':
