@@ -28,8 +28,8 @@ void delHexView(struct HexView *p) {
 }
 
 #define DUMP(x) \
-    if (x <= 0x20 || x==0x7F || x=0x255) addch('.'); \
-    else addch(x)
+    if (x <= 0x20 || x==0x7F || x==0xFF) addch('.'); \
+    else addch(x);
 
 void render(struct HexView *hv) {
     unsigned int nLines = hv->settings.textLines;
