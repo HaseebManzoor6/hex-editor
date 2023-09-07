@@ -24,20 +24,20 @@ void CmdErr::printmsg(CmdErr::Type t) {
 }
 
 CmdErr::Type acceptCmd(struct HexView *h) {
-    int i=0;
-    char c, *buf = h->cmdbuf;
+    int i=0, c;
+    char *buf = h->cmdbuf;
     clrtoeol();
-    nocbreak();
     echo();
     while(i<CMD_BUFSIZE-1) {
         c = getch();
         buf[i] = c;
-        // TODO ncurses ESC code to cancel command
         if(c == '\n' || c == '\r') break;
+        if(c == 27) {
+            i=0; break;
+        }
         i++;
     }
     noecho();
-    cbreak();
     h->cmdLen=i;
     buf[i] = '\0';
 
