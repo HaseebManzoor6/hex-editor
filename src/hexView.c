@@ -5,6 +5,7 @@
 
 #include "hexView.h"
 #include "libChunks.h"
+#include "colors.h"
 
 #define HEX "0123456789ABCDEF"
 #define BYTETOHEX(x) HEX[x & 0xF]
@@ -27,9 +28,9 @@ void delHexView(struct HexView *p) {
     free(p->cmdbuf);
 }
 
-#define DUMP(x) \
+#define DUMP(x) {\
     if (x <= 0x20 || x==0x7F || x==0xFF) addch('.'); \
-    else addch(x);
+    else addch(x);}
 
 void render(struct HexView *hv) {
     unsigned int nLines = hv->settings.textLines;
@@ -51,15 +52,15 @@ void render(struct HexView *hv) {
 
         for(int x=0; x<LINELENGTH && !(hv->cs.eof); x++) {
             c = chunksGet(&(hv->cs),(y+hv->startLine)*LINELENGTH+x);
-            if(hv->cs.eof && hv->settings.termColors) attron(COLOR_PAIR(2));
+            //if(hv->cs.eof && hv->settings.termColors) attron(COLOR_PAIR(COLOR_EOF));
             // Print hex
             move(y+1, x*3+(hv->addrsize)+1);
             addch(BYTETOHEX(c>>4)); addch(BYTETOHEX(c));
             // Print dump
             move(y+1, LINELENGTH*3+(hv->addrsize)+x+3);
-            DUMP(c)
+            DUMP(c);
 
-            if(hv->settings.termColors) attron(COLOR_PAIR(1));
+            //if(hv->settings.termColors) attroff(COLOR_PAIR(COLOR_EOF));
         }
 
         addch('\n');

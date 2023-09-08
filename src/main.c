@@ -6,6 +6,7 @@
 #include "libChunks.h"
 #include "libCmd.h"
 #include "hexView.h"
+#include "colors.h"
 
 
 
@@ -121,16 +122,42 @@ void handleKeyReplace(int c, struct HexView *h, struct HexViewMeta *m) {
         case KEY_IC:
             m->mode=MODE_INSERT;
             break;
+        case 'a':
+        case 'b':
+        case 'c':
+        case 'd':
+        case 'e':
+        case 'f':
+            break;
+        case 'A':
+        case 'B':
+        case 'C':
+        case 'D':
+        case 'E':
+        case 'F':
+            break;
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+            break;
+
     }
 }
 
 void renderMode(HexViewMeta *m) {
     if(m->mode==MODE_INSERT) {
-        attron(COLOR_PAIR(4));
+        attron(COLOR_PAIR(COLOR_MODE));
         printw("\n-- INSERT --");
     }
     else if(m->mode==MODE_REPLACE) {
-        attron(COLOR_PAIR(4));
+        attron(COLOR_PAIR(COLOR_MODE));
         printw("\n-- REPLACE --");
     }
     else{clrtoeol();}
@@ -169,10 +196,11 @@ int main(int argc, char *argv[]) {
     if(h.settings.termColors) {
         start_color();
         use_default_colors();
-        init_pair(1, -1, -1); // term colors
-        init_pair(2, COLOR_RED, -1);
-        init_pair(3, COLOR_RED, -1);
-        init_pair(4, COLOR_YELLOW, -1);
+        init_pair(COLOR_TXT, -1, -1); // term colors
+        init_pair(COLOR_EOF, COLOR_RED, -1);
+        init_pair(COLOR_ERR_MSG, COLOR_RED, -1);
+        init_pair(COLOR_MODE, COLOR_YELLOW, -1);
+        init_pair(COLOR_TXT_REPL, COLOR_YELLOW, -1);
     }
 
     // Main loop
@@ -184,10 +212,10 @@ int main(int argc, char *argv[]) {
 
         // error message line
         if(h.settings.termColors) {
-            attron(COLOR_PAIR(3)); attron(A_REVERSE); attron(A_BOLD);}
+            attron(COLOR_PAIR(COLOR_ERR_MSG)); attron(A_REVERSE); attron(A_BOLD);}
         CmdErr::printmsg(m.err);
         if(h.settings.termColors) {
-            attron(COLOR_PAIR(1)); attroff(A_REVERSE); attroff(A_BOLD);}
+            attroff(COLOR_PAIR(COLOR_ERR_MSG)); attroff(A_REVERSE); attroff(A_BOLD);}
         m.err = CmdErr::Ok;
 
         move(1+h.cury, 1+h.addrsize+3*(h.curx/2)+(h.curx%2));
