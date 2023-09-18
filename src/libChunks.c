@@ -9,10 +9,6 @@
 
 #define MEM_ERR fprintf(stderr,"malloc error"); exit(66);
 
-struct FileChunk {
-    char *chunk;
-    unsigned int size;
-};
 
 void initFileChunk(struct FileChunk *p, unsigned int capacity) {
     p->chunk = (char *)malloc(capacity*sizeof(char));
@@ -38,8 +34,8 @@ void initChunkSet(struct ChunkSet *p, FILE *fp, unsigned int chunkSize) {
 
     p->fp = fp;
 
-    if(NULL == (p->low  = (FileChunk*)malloc(sizeof(struct FileChunk)))) {MEM_ERR}
-    if(NULL == (p->high = (FileChunk*)malloc(sizeof(struct FileChunk)))) {MEM_ERR}
+    if(NULL == (p->low  = (struct FileChunk*)malloc(sizeof(struct FileChunk)))) {MEM_ERR}
+    if(NULL == (p->high = (struct FileChunk*)malloc(sizeof(struct FileChunk)))) {MEM_ERR}
 
     initFileChunk(p->low, chunkSize);
     initFileChunk(p->high, chunkSize);
@@ -64,7 +60,7 @@ void delChunkSet(struct ChunkSet *p) {
 }
 
 
-char chunksGet(struct ChunkSet *p, unsigned long i) {
+char chunksGet(struct ChunkSet *p, addr_t i) {
 #ifdef DEBUG
     fprintf(stderr,"get 0x%lx\n ",i);
 #endif

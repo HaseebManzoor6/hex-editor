@@ -2,11 +2,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <map>
 
 #include "libChunks.h"
 #include "libCmd.h"
 #include "hexView.h"
 #include "colors.h"
+#include "types.h"
 
 
 

@@ -11,7 +11,7 @@
 #define CURSORLINE(h) h->cury+h->startLine
 #define NLINES(h) CEILDIVIDE((h).cs.fsize,LINELENGTH)
 // Byte index in the file
-#define FILEPOS(h) LINELENGTH*(h->startLine+h->cury)+(h->curx+1)/2
+#define FILEPOS(h) (LINELENGTH*(h->startLine+h->cury)+(h->curx+1)/2)
 
 // Size of buffer for commands
 #define CMD_BUFSIZE 128

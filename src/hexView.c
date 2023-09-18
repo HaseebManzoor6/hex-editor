@@ -6,6 +6,7 @@
 #include "hexView.h"
 #include "libChunks.h"
 #include "colors.h"
+#include "types.h"
 
 #define HEX "0123456789ABCDEF"
 #define BYTETOHEX(x) HEX[x & 0xF]
@@ -52,6 +53,7 @@ void render(struct HexView *hv) {
 
         for(int x=0; x<LINELENGTH && !(hv->cs.eof); x++) {
             c = chunksGet(&(hv->cs),(y+hv->startLine)*LINELENGTH+x);
+
             //if(hv->cs.eof && hv->settings.termColors) attron(COLOR_PAIR(COLOR_EOF));
             // Print hex
             move(y+1, x*3+(hv->addrsize)+1);

@@ -13,8 +13,8 @@ endif
 
 
 
-executable: libChunks hexView libCmd main.c
-	$(CC) $(CURSES_LIB_DEF) $(DBG_FLAGS) -o ../bin/hv.exe main.c libCmd.o libChunks.o hexView.o $(CURSES_LNK) -lm
+executable: libChunks hexView libCmd main.cpp
+	$(CC) $(CURSES_LIB_DEF) $(DBG_FLAGS) -o ../bin/hv.exe main.cpp libCmd.o libChunks.o hexView.o $(CURSES_LNK) -lm
 
 dbg: DBG_FLAGS = -g -DDEBUG
 dbg: executable
