@@ -6,20 +6,16 @@
 #include "libCmd.h"
 #include "hexView.h"
 
-
-#define PRINT_FN(str) printw(str)
-void CmdErr::printmsg(CmdErr::Type t) {
+const std::string CmdErr::getmsg(CmdErr::Type t) {
     switch(t) {
         case CmdErr::Ok:
-            PRINT_FN("\n");
-            break;
+            return "\n";
 
         case CmdErr::UNKNOWN:
-            PRINT_FN( "Unknown command\n" );
-            break;
+            return "Unknown command\n";
 
         default:
-            PRINT_FN( "[Internal] Unknown error code\n" );
+            return "[Internal] Unknown error code\n";
     }
 }
 
@@ -68,8 +64,8 @@ unsigned long hexToDec(const char *buf, int size) {
     return ret;
 }
 
-// TODO response messages
-#define MIN(x,y) x=(y<x)? y:x
+#define MIN(x,y) (((y)<(x))? (y):(x))
+#define MAX(x,y) (((y)<(x))? (x):(y))
 CmdErr::Type parseCmd(struct HexView *h) {
     const char *buf = h->cmdbuf;
     int isAddr=1; // Is hex line number
@@ -81,7 +77,6 @@ CmdErr::Type parseCmd(struct HexView *h) {
     }
     if(h->cmdLen==0) isAddr=0;
 
-    // Jump to line
     // TODO Always jump to 1 screen above, as vim does
     if(isAddr) 
         h->startLine = hexToDec(buf,h->cmdLen);
@@ -92,11 +87,12 @@ CmdErr::Type parseCmd(struct HexView *h) {
 
     // Jump to line
     if(isAddr) {
-        h->curx=0;
-        h->cury=MIN(h->startLine,NLINES((*h))-1);
-        h->startLine = MIN(h->startLine, CEILDIVIDE(h->cs.fsize,LINELENGTH) - h->settings.textLines);
+        // TODO fix cursor can go off the end of last line using :$
+        h->cury=h->startLine/LINELENGTH;
+        h->curx = 2*(h->startLine % LINELENGTH);
+        h->startLine = MIN(h->startLine, h->cs.fsize - (LINELENGTH*(h->settings.textLines-1)));
+        h->startLine/=LINELENGTH;
         h->cury-=h->startLine;
-        if(h->startLine<0) h->startLine=0;
 
         return CmdErr::Ok;
     }

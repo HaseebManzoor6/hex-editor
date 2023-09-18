@@ -16,7 +16,7 @@ void initHexView(struct HexView *p, FILE *fp, unsigned int textLines, int hasCol
     p->startLine=0;
     p->settings.textLines = textLines;
     initChunkSet(&(p->cs), fp, textLines * LINELENGTH);
-    p->addrsize = (logl((double)(p->cs.fsize))/logl(16.0)); // Number of hex digits for addresses
+    p->addrsize = (logl((double)(p->cs.fsize))/logl(16.0))+1; // Number of hex digits for addresses
     p->settings.termColors = hasColors;
 
     p->cmdbuf = (char*)malloc(CMD_BUFSIZE*sizeof(char));
@@ -46,9 +46,11 @@ void render(struct HexView *hv) {
 
     // Print file
     for(int y=0; y<nLines && !(hv->cs.eof); y++) {
+
         // Print address
-        for(int i=hv->addrsize-1; i>=0; i--)
+        for(int i=hv->addrsize-2; i>=0; i--)
             addch(BYTETOHEX((startLine+y) >> (i*4)));
+        addch('0');
         printw("                                                 | ");
 
         for(int x=0; x<LINELENGTH && !(hv->cs.eof); x++) {

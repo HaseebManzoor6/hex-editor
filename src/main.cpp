@@ -215,7 +215,7 @@ int main(int argc, char *argv[]) {
         // error message line
         if(h.settings.termColors) {
             attron(COLOR_PAIR(COLOR_ERR_MSG)); attron(A_REVERSE); attron(A_BOLD);}
-        CmdErr::printmsg(m.err);
+        printw("%s",CmdErr::getmsg(m.err).c_str());
         if(h.settings.termColors) {
             attroff(COLOR_PAIR(COLOR_ERR_MSG)); attroff(A_REVERSE); attroff(A_BOLD);}
         m.err = CmdErr::Ok;

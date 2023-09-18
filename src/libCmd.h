@@ -1,19 +1,20 @@
 #ifndef LIBCMD_H
 #define LIBCMD_H
 
+#include <string>
+
 #include "hexView.h"
 
 
 
-class CmdErr {
-    public:
-        enum Type {
-            Ok = 0, // No error
+namespace CmdErr {
+    enum Type {
+        Ok = 0, // No error
 
-            UNKNOWN, // Unknown command
-        };
-        
-        static void printmsg(CmdErr::Type t);
+        UNKNOWN, // Unknown command
+    };
+    
+    const std::string getmsg(CmdErr::Type t);
 };
 
 /*

@@ -25,5 +25,5 @@ libChunks: libChunks.c
 hexView: hexView.c libChunks.o
 	$(CC) $(CURSES_LIB_DEF) $(DBG_FLAGS) -c -o hexView.o hexView.c
 
-libCmd: libCmd.c hexView.o
-	$(CC) $(CURSES_LIB_DEF) $(DBG_FLAGS) -c -o libCmd.o libCmd.c 
+libCmd: libCmd.cpp hexView.o
+	$(CC) $(CURSES_LIB_DEF) $(DBG_FLAGS) -c -o libCmd.o libCmd.cpp 
