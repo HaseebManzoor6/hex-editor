@@ -87,9 +87,8 @@ CmdErr::Type parseCmd(struct HexView *h) {
 
     // Jump to line
     if(isAddr) {
-        // TODO fix cursor can go off the end of last line using :$
         h->cury=h->startLine/LINELENGTH;
-        h->curx = 2*(h->startLine % LINELENGTH);
+        h->curx = 2*(MIN(h->startLine,h->cs.fsize-1) % LINELENGTH);
         h->startLine = MIN(h->startLine, h->cs.fsize - (LINELENGTH*(h->settings.textLines-1)));
         h->startLine/=LINELENGTH;
         h->cury-=h->startLine;
